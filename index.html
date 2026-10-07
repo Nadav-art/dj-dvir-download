@@ -57,7 +57,6 @@ h1 .grad{background:linear-gradient(90deg,#18e0ff,#8a5bff);-webkit-background-cl
 .feat .ico{font-size:34px}.feat h4{margin:8px 0 4px;font-size:15.5px}.feat p{margin:0;color:var(--mut);font-size:12.5px;line-height:1.5}
 .feat{cursor:pointer;transition:transform .12s,border-color .12s,box-shadow .12s}
 .feat:hover{transform:translateY(-4px);border-color:var(--acc);box-shadow:0 16px 40px rgba(0,0,0,.45)}
-.feat .peek{display:inline-block;margin-top:10px;font-size:11.5px;font-weight:700;color:var(--acc);opacity:.9}
 /* big neon hero icon */
 .hero-ico{width:clamp(120px,24vw,200px);aspect-ratio:1;margin:0 auto 10px;background:url(assets/app-icon.png) center/contain no-repeat;filter:drop-shadow(0 14px 44px rgba(91,140,255,.45));animation:floaty 4s ease-in-out infinite}
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -134,14 +133,14 @@ footer{margin-top:48px;text-align:center;color:#5f719c;font-size:12.5px;padding-
     <div class="sec-t">מה יש בפנים</div>
     <p class="sec-s">מערכת אחת, לכל סוג משתמש</p>
     <div class="feats">
-      <div class="feat" data-feat="dj"><div class="ico">🎧</div><h4>אולפן דיג'יי</h4><p>שני דקים, מיקס, BPM וסולם, אפקטים</p><span class="peek">👁 הצצה</span></div>
-      <div class="feat" data-feat="karaoke"><div class="ico">🎤</div><h4>קריוקי על וידאו</h4><p>מילים מסונכרנות, הסרת ווקאל, דואט</p><span class="peek">👁 הצצה</span></div>
-      <div class="feat" data-feat="kids"><div class="ico">📖</div><h4>חדר ילדים</h4><p>קריאה ושירה לפי השיר, משחקי אותיות</p><span class="peek">👁 הצצה</span></div>
-      <div class="feat" data-feat="creators"><div class="ico">✂️</div><h4>חדר יוצרים</h4><p>עריכה, בניית ליווי והפקה — הכול מודרך</p><span class="peek">👁 הצצה</span></div>
-      <div class="feat" data-feat="ai"><div class="ico">🎹</div><h4>סטודיו AI</h4><p>מזמזמים — וה-AI בונה ליווי מלא</p><span class="peek">👁 הצצה</span></div>
-      <div class="feat" data-feat="live"><div class="ico">📡</div><h4>שידור חי</h4><p>ל-YouTube ולטלוויזיה, בלי דיליי</p><span class="peek">👁 הצצה</span></div>
-      <div class="feat" data-feat="clip"><div class="ico">🎬</div><h4>קליפים</h4><p>מצלמה חיה מאחורי המילים — ומקליטים</p><span class="peek">👁 הצצה</span></div>
-      <div class="feat" data-feat="mobile"><div class="ico">📱</div><h4>גם בנייד</h4><p>אותו ממשק, מותאם לטלפון</p><span class="peek">👁 הצצה</span></div>
+      <div class="feat" data-feat="dj"><div class="ico">🎧</div><h4>אולפן דיג'יי</h4><p>שני דקים, מיקס, BPM וסולם, אפקטים</p></div>
+      <div class="feat" data-feat="karaoke"><div class="ico">🎤</div><h4>קריוקי על וידאו</h4><p>מילים מסונכרנות, הסרת ווקאל, דואט</p></div>
+      <div class="feat" data-feat="kids"><div class="ico">📖</div><h4>חדר ילדים</h4><p>קריאה ושירה לפי השיר, משחקי אותיות</p></div>
+      <div class="feat" data-feat="creators"><div class="ico">✂️</div><h4>חדר יוצרים</h4><p>עריכה, בניית ליווי והפקה — הכול מודרך</p></div>
+      <div class="feat" data-feat="ai"><div class="ico">🎹</div><h4>סטודיו AI</h4><p>מזמזמים — וה-AI בונה ליווי מלא</p></div>
+      <div class="feat" data-feat="live"><div class="ico">📡</div><h4>שידור חי</h4><p>ל-YouTube ולטלוויזיה, בלי דיליי</p></div>
+      <div class="feat" data-feat="clip"><div class="ico">🎬</div><h4>קליפים</h4><p>מצלמה חיה מאחורי המילים — ומקליטים</p></div>
+      <div class="feat" data-feat="mobile"><div class="ico">📱</div><h4>גם בנייד</h4><p>אותו ממשק, מותאם לטלפון</p></div>
     </div>
   </section>
 
@@ -237,12 +236,10 @@ const FEATURES = {
 function openFeat(key) { const f = FEATURES[key]; if (!f) return;
   document.getElementById('fmico').textContent = f.ico;
   document.getElementById('fmtitle').textContent = f.title;
-  // REAL screenshot from the actual app (not a mockup)
-  // the AI feature shows a LIVE, working humming interface (record → the real engine builds a backing),
-  // not a static screenshot. Every other feature shows a real screenshot.
-  document.getElementById('fmscene').innerHTML = (key === 'ai')
-    ? aiDemoHTML()
-    : `<img class="shot" src="assets/shots/feat-${key}.jpg?v=1" alt="${f.title}">`;
+  // One clean layer — no external screenshot that pops in late and looks off.
+  // AI shows a LIVE humming interface; every other feature shows its on-brand rendered scene
+  // (instant, no network, nothing to "jump" to).
+  document.getElementById('fmscene').innerHTML = (key === 'ai') ? aiDemoHTML() : f.scene;
   document.getElementById('fmemo').textContent = (key === 'ai') ? 'זמזמו עד 5 שניות — וה-AI יהפוך את זה לליווי מלא (ממש כאן, לא הדמיה).' : f.emo;
   document.querySelector('.fmbox').classList.toggle('wide', key === 'ai');
   document.getElementById('fmodal').classList.add('on');
@@ -287,36 +284,72 @@ function wireAiDemo() {
   const box = document.querySelector('.aidemo'), btn = document.getElementById('aiRec'),
         st = document.getElementById('aiStatus'), au = document.getElementById('aiAudio');
   if (!btn) return;
+  const bars = [...box.querySelectorAll('#aiWave span')];
   const lbl = t => { btn.innerHTML = '<span class="dot"></span> ' + t; };
-  let style = 'pop';
+  let style = 'pop', recording = false, rec = null, iv = 0, raf = 0, actx = null;
   box.querySelectorAll('.tchip[data-style]').forEach(c => c.onclick = () => {
     box.querySelectorAll('.tchip[data-style]').forEach(x => x.classList.remove('on')); c.classList.add('on'); style = c.dataset.style;
   });
   box.querySelectorAll('.tchip[data-full]').forEach(c => c.onclick = () => { st.textContent = '✨ זה נפתח במלואו במערכת — הורידו כדי לבחור כלים, סאונדים ולהעלות משלכם'; });
+
+  // live voice meter: the purple bars rise/fall with how loud you are (an intensity cue, not exact pitch)
+  function startMeter(stream) {
+    try {
+      actx = new (window.AudioContext || window.webkitAudioContext)();
+      const src = actx.createMediaStreamSource(stream), an = actx.createAnalyser();
+      an.fftSize = 128; an.smoothingTimeConstant = 0.75; src.connect(an);
+      const data = new Uint8Array(an.frequencyBinCount);
+      bars.forEach(b => { b.style.animation = 'none'; });
+      const tick = () => {
+        an.getByteFrequencyData(data);
+        let sum = 0; for (let i = 0; i < data.length; i++) sum += data[i];
+        const avg = sum / data.length / 255;                               // overall loudness 0..1
+        bars.forEach((b, i) => {
+          const band = data[Math.min(data.length - 1, 2 + i * 2)] / 255;   // a little per-bar life
+          const lvl = Math.min(1, avg * 0.7 + band * 0.8);
+          b.style.height = (10 + lvl * 36).toFixed(0) + 'px';
+        });
+        raf = requestAnimationFrame(tick);
+      };
+      tick();
+    } catch (_) {}
+  }
+  function stopMeter() {
+    cancelAnimationFrame(raf); raf = 0;
+    try { actx && actx.close(); } catch (_) {} actx = null;
+    bars.forEach(b => { b.style.animation = ''; b.style.height = ''; });
+  }
+
+  async function finish(stream, chunks) {
+    clearInterval(iv); stopMeter();
+    stream.getTracks().forEach(t => t.stop()); box.classList.remove('rec'); recording = false;
+    btn.disabled = true; lbl('בונה ליווי…');
+    st.textContent = '🎹 ה-AI בונה את הליווי… (אם זו הפעלה ראשונה, מנוע ה-AI מתעורר — ~30 שניות)';
+    try {
+      const ab = await new Blob(chunks).arrayBuffer();
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const wav = encodeWAV(await ctx.decodeAudioData(ab));
+      const fd = new FormData(); fd.append('file', wav, 'hum.wav'); fd.append('style', style);
+      const r = await fetch(CFG.DEMO_API.replace(/\/$/, '') + '/api/demo', { method: 'POST', body: fd });
+      if (!r.ok) throw new Error();
+      au.src = URL.createObjectURL(await r.blob()); au.style.display = 'block'; au.play().catch(() => {});
+      st.innerHTML = '✨ <b>זה הליווי שה-AI בנה מהזמזום שלך!</b> — דמיינו מה אפשר במערכת המלאה.';
+    } catch (e) { st.textContent = '⏳ מנוע ה-AI עדיין מתעורר (שרת חינמי שנרדם בין הדגמות) — נסו שוב בעוד רגע.'; }
+    btn.disabled = false; lbl('הקליטו שוב');
+  }
+
   btn.onclick = async () => {
-    btn.disabled = true; au.style.display = 'none'; st.textContent = 'מבקש גישה למיקרופון…';
+    if (recording) { try { rec.stop(); } catch (_) {} return; }   // tap again = stop now (even before 5s)
+    au.style.display = 'none'; st.textContent = 'מבקש גישה למיקרופון…';
     let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
-    catch (e) { st.textContent = '🎙️ צריך הרשאת מיקרופון כדי לנסות'; btn.disabled = false; return; }
-    const rec = new MediaRecorder(stream), chunks = [];
+    catch (e) { st.textContent = '🎙️ צריך הרשאת מיקרופון כדי לנסות'; return; }
+    const chunks = []; rec = new MediaRecorder(stream);
     rec.ondataavailable = e => e.data.size && chunks.push(e.data);
-    rec.onstop = async () => {
-      stream.getTracks().forEach(t => t.stop()); box.classList.remove('rec');
-      st.textContent = '🎹 ה-AI בונה את הליווי… (יכול לקחת רגע בהתעוררות השרת)';
-      try {
-        const ab = await new Blob(chunks).arrayBuffer();
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const wav = encodeWAV(await ctx.decodeAudioData(ab));
-        const fd = new FormData(); fd.append('file', wav, 'hum.wav'); fd.append('style', style);
-        const r = await fetch(CFG.DEMO_API.replace(/\/$/, '') + '/api/demo', { method: 'POST', body: fd });
-        if (!r.ok) throw new Error();
-        au.src = URL.createObjectURL(await r.blob()); au.style.display = 'block'; au.play().catch(() => {});
-        st.innerHTML = '✨ <b>זה הליווי שה-AI בנה מהזמזום שלך!</b> — דמיינו מה אפשר במערכת המלאה.';
-      } catch (e) { st.textContent = 'השרת מתעורר (free) — נסו שוב בעוד רגע.'; }
-      btn.disabled = false; lbl('הקליטו שוב');
-    };
-    box.classList.add('rec'); rec.start();
-    let t = 5; st.textContent = '🔴 זמזמו מנגינה… ' + t;
-    const iv = setInterval(() => { t--; if (t > 0) st.textContent = '🔴 זמזמו מנגינה… ' + t; else { clearInterval(iv); try { rec.stop(); } catch (_) {} } }, 1000);
+    rec.onstop = () => finish(stream, chunks);
+    box.classList.add('rec'); rec.start(); recording = true; startMeter(stream);
+    lbl('⏹ עצרו עכשיו');
+    let t = 5; st.textContent = '🔴 זמזמו מנגינה… ' + t + ' (אפשר לעצור מתי שרוצים)';
+    iv = setInterval(() => { t--; if (t > 0) st.textContent = '🔴 זמזמו מנגינה… ' + t + ' (אפשר לעצור מתי שרוצים)'; else { clearInterval(iv); try { rec.stop(); } catch (_) {} } }, 1000);
   };
 }
 function closeFeat() { document.getElementById('fmodal').classList.remove('on'); }
