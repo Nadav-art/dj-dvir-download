@@ -346,7 +346,7 @@ function wireAiDemo() {
     clearInterval(iv); stopMeter();
     stream.getTracks().forEach(t => t.stop()); box.classList.remove('rec'); recording = false;
     btn.disabled = true; lbl('בונה ליווי…');
-    st.textContent = '🎹 ה-AI בונה את הליווי… (אם זו הפעלה ראשונה, מנוע ה-AI מתעורר — ~30 שניות)';
+    st.textContent = '🎹 ה-AI בונה את הליווי… רגע אחד';
     try {
       const ab = await new Blob(chunks).arrayBuffer();
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -356,7 +356,7 @@ function wireAiDemo() {
       if (!r.ok) throw new Error();
       au.src = URL.createObjectURL(await r.blob()); au.style.display = 'block'; au.play().catch(() => {});
       st.innerHTML = '✨ <b>זה הליווי שה-AI בנה מהזמזום שלך!</b> — דמיינו מה אפשר במערכת המלאה.';
-    } catch (e) { st.textContent = '⏳ מנוע ה-AI עדיין מתעורר (שרת חינמי שנרדם בין הדגמות) — נסו שוב בעוד רגע.'; }
+    } catch (e) { st.textContent = '⏳ רגע — המנוע מתכונן. נסו שוב עוד כמה שניות.'; }
     btn.disabled = false; lbl('הקליטו שוב');
   }
 
