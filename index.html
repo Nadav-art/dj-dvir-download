@@ -69,6 +69,7 @@ h1 .grad{background:linear-gradient(90deg,#18e0ff,#8a5bff);-webkit-background-cl
 .fmx{position:absolute;inset-inline-start:16px;top:14px;background:transparent;border:0;color:var(--mut);font-size:22px;cursor:pointer;line-height:1}
 .fmhead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
 .fmico{font-size:38px}.fmhead h3{margin:0;font-size:22px;font-weight:800}
+.fmscene .shot{width:100%;border-radius:12px;display:block;border:1px solid #20305c;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .fmemo{color:#d3ddf7;font-size:15.5px;line-height:1.75;margin:16px 2px 20px;text-align:center}
 .fmdl{text-align:center}
 .scene{position:relative;border-radius:16px;overflow:hidden;min-height:200px;background:radial-gradient(ellipse at 50% 28%,#1a2d5a,#070e1f);border:1px solid #20305c;display:flex;align-items:center;justify-content:center;gap:14px;padding:18px;flex-wrap:wrap}
@@ -215,7 +216,8 @@ const FEATURES = {
 function openFeat(key) { const f = FEATURES[key]; if (!f) return;
   document.getElementById('fmico').textContent = f.ico;
   document.getElementById('fmtitle').textContent = f.title;
-  document.getElementById('fmscene').innerHTML = f.scene;
+  // REAL screenshot from the actual app (not a mockup)
+  document.getElementById('fmscene').innerHTML = `<img class="shot" src="assets/shots/feat-${key}.jpg?v=1" alt="${f.title}">`;
   document.getElementById('fmemo').textContent = f.emo;
   document.getElementById('fmodal').classList.add('on');
 }
