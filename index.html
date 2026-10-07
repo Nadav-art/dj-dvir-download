@@ -69,7 +69,15 @@ h1 .grad{background:linear-gradient(90deg,#18e0ff,#8a5bff);-webkit-background-cl
 .fmx{position:absolute;inset-inline-start:16px;top:14px;background:transparent;border:0;color:var(--mut);font-size:22px;cursor:pointer;line-height:1}
 .fmhead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
 .fmico{font-size:38px}.fmhead h3{margin:0;font-size:22px;font-weight:800}
-.fmscene .shot{width:100%;border-radius:12px;display:block;border:1px solid #20305c;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.fmbox.wide{width:min(720px,96vw)}
+.fmscene .shot{width:100%;aspect-ratio:1550/1000;object-fit:cover;border-radius:12px;display:block;border:1px solid #20305c;box-shadow:0 10px 30px rgba(0,0,0,.4);background:#0a1430}
+.aidemo-tools{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.aidemo-trow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:8px}
+.aidemo-trow .tlbl{font-size:12px;color:#9fb0d6;margin-inline-end:4px}
+.tchip{background:#122048;border:1px solid #2a3a66;color:#dfe7ff;border-radius:999px;padding:6px 13px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+.tchip:hover{border-color:#5b8cff}.tchip.on{background:linear-gradient(90deg,#5b8cff,#8a5bff);border:0;color:#fff}
+.tchip.ghost{opacity:.75;border-style:dashed}
+.aidemo-hint{font-size:11.5px;color:#7f93bd;margin-top:6px}
 .aidemo{text-align:center;background:radial-gradient(ellipse at 50% 20%,#1f2a55,#0a1430);border:1px solid var(--line);border-radius:16px;padding:22px 18px;min-height:200px;display:flex;flex-direction:column;justify-content:center}
 .aidemo-t{font-size:17px;font-weight:800;color:#eaf0ff;margin-bottom:16px}
 .aidemo-wave{display:flex;gap:4px;align-items:center;justify-content:center;height:46px;margin-bottom:16px}
@@ -156,8 +164,8 @@ footer{margin-top:48px;text-align:center;color:#5f719c;font-size:12.5px;padding-
     <div class="fmbox">
       <button class="fmx" id="fmx" aria-label="סגור">✕</button>
       <div class="fmhead"><span class="fmico" id="fmico"></span><h3 id="fmtitle"></h3></div>
-      <div id="fmscene"></div>
       <p class="fmemo" id="fmemo"></p>
+      <div id="fmscene"></div>
       <div class="fmdl"><a class="dl" id="fmdl" href="#dl2">הורדה חינם ←</a></div>
     </div>
   </div>
@@ -236,6 +244,7 @@ function openFeat(key) { const f = FEATURES[key]; if (!f) return;
     ? aiDemoHTML()
     : `<img class="shot" src="assets/shots/feat-${key}.jpg?v=1" alt="${f.title}">`;
   document.getElementById('fmemo').textContent = (key === 'ai') ? 'זמזמו עד 5 שניות — וה-AI יהפוך את זה לליווי מלא (ממש כאן, לא הדמיה).' : f.emo;
+  document.querySelector('.fmbox').classList.toggle('wide', key === 'ai');
   document.getElementById('fmodal').classList.add('on');
   if (key === 'ai') wireAiDemo();
 }
@@ -245,11 +254,21 @@ function openFeat(key) { const f = FEATURES[key]; if (!f) return;
 function aiDemoHTML() {
   return `<div class="aidemo">
     <div class="aidemo-t">🎹 זמזמו מנגינה — וה-AI יבנה ליווי מלא</div>
-    <div class="aidemo-wrap">
-      <div class="aidemo-wave" id="aiWave"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-      <button class="aidemo-rec" id="aiRec"><span class="dot"></span> הקליטו (עד 5 שניות)</button>
-      <div class="note" id="aiStatus">הקישו, זמזמו מנגינה קצרה — והקשיבו מה שה-AI בונה.</div>
-      <audio id="aiAudio" controls style="display:none;width:100%;margin-top:10px"></audio>
+    <div class="aidemo-wave" id="aiWave"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <button class="aidemo-rec" id="aiRec"><span class="dot"></span> הקליטו (עד 5 שניות)</button>
+    <div class="note" id="aiStatus">הקישו, זמזמו מנגינה קצרה — והקשיבו מה שה-AI בונה.</div>
+    <audio id="aiAudio" controls style="display:none;width:100%;margin-top:10px"></audio>
+    <div class="aidemo-tools">
+      <div class="aidemo-trow"><span class="tlbl">סגנון</span>
+        <button class="tchip on" data-style="pop">🎸 פופ</button>
+        <button class="tchip" data-style="ballad">🎹 בלדה</button>
+        <button class="tchip" data-style="electronic">🎛️ אלקטרוני</button></div>
+      <div class="aidemo-trow"><span class="tlbl">כלים וסאונדים</span>
+        <button class="tchip ghost" data-full>🥁 תופים</button>
+        <button class="tchip ghost" data-full>🎸 בס</button>
+        <button class="tchip ghost" data-full>🎹 קלידים</button>
+        <button class="tchip ghost" data-full>⬆️ סאונד משלכם</button></div>
+      <div class="aidemo-hint">✨ בחירת-כלים, ספריית-סאונדים חינמית, והעלאת-צלילים משלכם — במערכת המלאה</div>
     </div>
   </div>`;
 }
@@ -269,6 +288,11 @@ function wireAiDemo() {
         st = document.getElementById('aiStatus'), au = document.getElementById('aiAudio');
   if (!btn) return;
   const lbl = t => { btn.innerHTML = '<span class="dot"></span> ' + t; };
+  let style = 'pop';
+  box.querySelectorAll('.tchip[data-style]').forEach(c => c.onclick = () => {
+    box.querySelectorAll('.tchip[data-style]').forEach(x => x.classList.remove('on')); c.classList.add('on'); style = c.dataset.style;
+  });
+  box.querySelectorAll('.tchip[data-full]').forEach(c => c.onclick = () => { st.textContent = '✨ זה נפתח במלואו במערכת — הורידו כדי לבחור כלים, סאונדים ולהעלות משלכם'; });
   btn.onclick = async () => {
     btn.disabled = true; au.style.display = 'none'; st.textContent = 'מבקש גישה למיקרופון…';
     let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
@@ -282,7 +306,7 @@ function wireAiDemo() {
         const ab = await new Blob(chunks).arrayBuffer();
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         const wav = encodeWAV(await ctx.decodeAudioData(ab));
-        const fd = new FormData(); fd.append('file', wav, 'hum.wav'); fd.append('style', 'pop');
+        const fd = new FormData(); fd.append('file', wav, 'hum.wav'); fd.append('style', style);
         const r = await fetch(CFG.DEMO_API.replace(/\/$/, '') + '/api/demo', { method: 'POST', body: fd });
         if (!r.ok) throw new Error();
         au.src = URL.createObjectURL(await r.blob()); au.style.display = 'block'; au.play().catch(() => {});
