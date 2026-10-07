@@ -107,7 +107,21 @@ h1 .grad{background:linear-gradient(90deg,#18e0ff,#8a5bff);-webkit-background-cl
 .disc.p{border-color:#b05bff;box-shadow:0 0 22px rgba(176,91,255,.55);color:#e9ccff}
 .wavebar{display:flex;gap:3px;align-items:center;height:42px}
 .wavebar i{width:4px;height:40%;background:linear-gradient(#36d07f,#5b8cff);border-radius:2px;animation:wv 1.1s ease-in-out infinite}
+.wavebar.big{height:62px}.wavebar.big i{width:4px;background:linear-gradient(#18e0ff,#8a5bff)}
 @keyframes wv{0%,100%{height:28%}50%{height:100%}}
+/* real-deck look: glowing jog wheels with vinyl grooves (deck A cyan · deck B purple) */
+.djscene{gap:16px}
+.djdeck{display:flex;flex-direction:column;align-items:center;gap:9px;--dc:#18e0ff}
+.djdeck.b{--dc:#c43cff}
+.djjog{position:relative;width:clamp(78px,14vw,104px);aspect-ratio:1}
+.djplatter{position:absolute;inset:0;border-radius:50%;
+  background:repeating-radial-gradient(circle at 50% 50%,#0c1733 0 2px,#091026 2px 4px),radial-gradient(circle at 42% 36%,#1b2c58,#06101f);
+  box-shadow:0 0 24px var(--dc),inset 0 0 0 3px var(--dc),inset 0 0 20px rgba(0,0,0,.65);animation:djspin 6s linear infinite}
+.djplatter::before{content:"";position:absolute;top:5px;left:50%;width:4px;height:17px;margin-left:-2px;border-radius:2px;background:var(--dc);box-shadow:0 0 8px var(--dc)}
+.djjog .jhub{position:absolute;inset:0;margin:auto;width:36%;height:36%;border-radius:50%;background:#0b1430;border:2px solid var(--dc);display:grid;place-items:center;color:#fff;font-weight:900;font-size:16px;box-shadow:0 0 10px var(--dc)}
+@keyframes djspin{to{transform:rotate(360deg)}}
+.djtags{display:flex;gap:6px}
+.djtags span{font-size:11px;font-weight:800;color:#bfe0ff;background:#0d1a3a;border:1px solid var(--dc);border-radius:7px;padding:3px 8px}
 .chip{display:inline-block;background:#122048;border:1px solid #2a3a66;border-radius:10px;padding:7px 12px;margin:4px;font-weight:700;color:#cdd9f5;font-size:13px}
 .phone{width:118px;height:220px;border-radius:22px;border:6px solid #2a3a66;background:#0a1430;position:relative;overflow:hidden}
 .tv{width:86%;aspect-ratio:16/10;border-radius:12px;border:4px solid #2a3a66;background:radial-gradient(circle at 50% 40%,#2a1a4a,#0a1430);position:relative;display:grid;place-items:center;color:#cdd9f5;font-weight:700}
@@ -231,7 +245,11 @@ function render(links){
 const wave = n => Array.from({ length: n }, (_, i) => `<i style="animation-delay:${(i * 0.07).toFixed(2)}s"></i>`).join('');
 const FEATURES = {
   dj: { ico: '🎧', title: "אולפן דיג'יי",
-    scene: `<div class="scene"><div class="disc">1</div><div class="wavebar">${wave(16)}</div><div class="disc p">2</div></div>`,
+    scene: `<div class="scene djscene">
+      <div class="djdeck b"><div class="djjog"><div class="djplatter"></div><span class="jhub">2</span></div><div class="djtags"><span>128 BPM</span><span>8A</span></div></div>
+      <div class="wavebar big">${wave(20)}</div>
+      <div class="djdeck a"><div class="djjog"><div class="djplatter"></div><span class="jhub">1</span></div><div class="djtags"><span>128 BPM</span><span>8A</span></div></div>
+    </div>`,
     emo: 'רגע אחד אתם בסלון — ובשני אתם ה-DJ של הערב. שני דקים, מיקס חלק, והקהל רוקד.' },
   karaoke: { ico: '🎤', title: 'קריוקי על וידאו',
     scene: `<div class="scene"><div class="k-lyric"><div class="big"><b>שׁוּב הַלַּיְלָה</b> יוֹרֵד</div><div class="next">וְהַכּוֹכָבִים נִדְלָקִים ✨</div></div></div>`,
@@ -302,13 +320,17 @@ function encodeWAV(buf) {
   let o = 44; for (let i = 0; i < n; i++) { const s = Math.max(-1, Math.min(1, ch[i])); v.setInt16(o, s < 0 ? s * 0x8000 : s * 0x7FFF, true); o += 2; }
   return new Blob([v], { type: 'audio/wav' });
 }
+// pre-warm: wake the (possibly idle) engine the moment the popup opens / recording starts, so by the time
+// the 5s hum is done the server is already up and the real request returns fast.
+function warmDemo() { try { fetch(CFG.DEMO_API.replace(/\/$/, '') + '/health', { cache: 'no-store' }).catch(() => {}); } catch (_) {} }
 function wireAiDemo() {
+  warmDemo();   // the AI popup just opened → start waking the engine now
   const box = document.querySelector('.aidemo'), btn = document.getElementById('aiRec'),
         st = document.getElementById('aiStatus'), au = document.getElementById('aiAudio');
   if (!btn) return;
   const bars = [...box.querySelectorAll('#aiWave span')];
   const lbl = t => { btn.innerHTML = '<span class="dot"></span> ' + t; };
-  let style = 'pop', recording = false, rec = null, iv = 0, raf = 0, actx = null;
+  let style = 'pop', recording = false, rec = null, iv = 0, raf = 0, actx = null, warmPoll = 0;
   box.querySelectorAll('.tchip[data-style]').forEach(c => c.onclick = () => {
     box.querySelectorAll('.tchip[data-style]').forEach(x => x.classList.remove('on')); c.classList.add('on'); style = c.dataset.style;
   });
@@ -343,7 +365,7 @@ function wireAiDemo() {
   }
 
   async function finish(stream, chunks) {
-    clearInterval(iv); stopMeter();
+    clearInterval(iv); clearInterval(warmPoll); stopMeter();
     stream.getTracks().forEach(t => t.stop()); box.classList.remove('rec'); recording = false;
     btn.disabled = true; lbl('בונה ליווי…');
     st.textContent = '🎹 ה-AI בונה את הליווי… רגע אחד';
@@ -362,6 +384,7 @@ function wireAiDemo() {
 
   btn.onclick = async () => {
     if (recording) { try { rec.stop(); } catch (_) {} return; }   // tap again = stop now (even before 5s)
+    warmDemo();   // wake the engine the instant recording starts — it warms during the 5s hum
     au.style.display = 'none'; st.textContent = 'מבקש גישה למיקרופון…';
     let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
     catch (e) { st.textContent = '🎙️ צריך הרשאת מיקרופון כדי לנסות'; return; }
@@ -369,6 +392,7 @@ function wireAiDemo() {
     rec.ondataavailable = e => e.data.size && chunks.push(e.data);
     rec.onstop = () => finish(stream, chunks);
     box.classList.add('rec'); rec.start(); recording = true; startMeter(stream);
+    warmPoll = setInterval(warmDemo, 2500);   // keep nudging the engine awake while they hum
     lbl('⏹ עצרו עכשיו');
     let t = 5; st.textContent = '🔴 זמזמו מנגינה… ' + t + ' (אפשר לעצור מתי שרוצים)';
     iv = setInterval(() => { t--; if (t > 0) st.textContent = '🔴 זמזמו מנגינה… ' + t + ' (אפשר לעצור מתי שרוצים)'; else { clearInterval(iv); try { rec.stop(); } catch (_) {} } }, 1000);
