@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DJ Dvir — הורדה</title>
+<meta name="description" content="DJ Dvir — אולפן דיג'יי, קריוקי, חדר ילדים, יצירה עם AI ושידור חי. הורדה חינם ל-Mac ו-Windows.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#eaf0ff;--mut:#9fb0d6;--line:#2a3a66;--acc:#5b8cff;--acc2:#8a5bff;--ok:#36d07f;--card:#0f1c3c}
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:'Rubik',-apple-system,'Segoe UI',Arial,sans-serif;color:var(--ink);
+  background:radial-gradient(ellipse at 50% 0%,#1b2c58 0%,#0b1732 40%,#060d1e 100%);min-height:100vh}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 20px 60px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0 10px}
+.logo{width:min(44vw,210px);aspect-ratio:2400/820;background:url(assets/djdvir-logo.png) center/contain no-repeat}
+.nav a{color:var(--mut);text-decoration:none;font-size:14px;margin-inline-start:16px}
+.nav a:hover{color:var(--ink)}
+.hero{text-align:center;padding:40px 0 18px}
+.badge{display:inline-block;background:rgba(91,140,255,.16);border:1px solid rgba(91,140,255,.4);color:#bcd0ff;
+  border-radius:999px;padding:5px 15px;font-size:13px;font-weight:600;margin-bottom:16px}
+h1{font-size:clamp(28px,5.2vw,46px);font-weight:900;margin:6px 0 10px;line-height:1.15}
+h1 .grad{background:linear-gradient(90deg,#18e0ff,#8a5bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--mut);font-size:clamp(15px,2.2vw,19px);max-width:620px;margin:0 auto 26px;line-height:1.6}
+.dlrow{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;align-items:center}
+.dl{display:inline-flex;align-items:center;gap:12px;border:0;border-radius:15px;padding:16px 26px;font:inherit;font-size:17px;
+  font-weight:800;color:#fff;cursor:pointer;text-decoration:none;background:linear-gradient(90deg,var(--acc),var(--acc2));
+  box-shadow:0 14px 34px rgba(91,140,255,.4);transition:transform .1s,filter .15s}
+.dl:hover{filter:brightness(1.08)}.dl:active{transform:translateY(1px)}
+.dl .os{font-size:26px}.dl small{display:block;font-size:12px;font-weight:500;opacity:.85}
+.dl.alt{background:#111f3e;border:1px solid var(--line);box-shadow:none;color:#dfe7ff}
+.trust{margin-top:14px;color:#6f82ad;font-size:13px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:46px 0 10px}
+@media(max-width:720px){.steps{grid-template-columns:1fr}}
+.step{background:linear-gradient(180deg,rgba(26,42,86,.5),rgba(12,22,48,.7));border:1px solid var(--line);border-radius:16px;padding:20px}
+.step .n{width:34px;height:34px;border-radius:50%;background:var(--acc);color:#04121e;font-weight:900;display:grid;place-items:center;margin-bottom:10px}
+.step h3{margin:0 0 6px;font-size:17px}.step p{margin:0;color:var(--mut);font-size:14px;line-height:1.55}
+.sec-t{text-align:center;font-size:24px;font-weight:800;margin:52px 0 6px}
+.sec-s{text-align:center;color:var(--mut);margin:0 0 24px}
+.feats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:860px){.feats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.feats{grid-template-columns:1fr}}
+.feat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;text-align:center}
+.feat .ico{font-size:34px}.feat h4{margin:8px 0 4px;font-size:15.5px}.feat p{margin:0;color:var(--mut);font-size:12.5px;line-height:1.5}
+footer{margin-top:54px;text-align:center;color:#5f719c;font-size:12.5px;border-top:1px solid var(--line);padding-top:20px}
+.cta{margin:50px auto 0;max-width:640px;text-align:center;background:linear-gradient(180deg,rgba(40,30,80,.5),rgba(12,22,48,.7));
+  border:1px solid var(--line);border-radius:20px;padding:30px 24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"></div>
+    <nav class="nav"><a href="#feat">יכולות</a><a href="#how">איך מתחילים</a><a href="#dl2">הורדה</a></nav>
+  </header>
+
+  <section class="hero">
+    <span class="badge">🎁 חינם לתקופת ניסיון · בלי כרטיס אשראי</span>
+    <h1>הופכים כל אחד ל<span class="grad">די-ג'יי</span>.<br>לנגן, לשיר, ליצור.</h1>
+    <p class="sub">אולפן דיג'יי מלא, קריוקי על וידאו, חדר ילדים, יצירה עם AI ושידור חי — הכול במערכת אחת, בעברית.</p>
+    <div class="dlrow" id="dlrow"><span class="trust">מזהה את המערכת שלך…</span></div>
+    <div class="trust" id="ver"></div>
+  </section>
+
+  <section id="how">
+    <div class="sec-t">מתחילים ב-3 צעדים</div>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h3>הורדה</h3><p>בוחרים את הגרסה למחשב שלכם — Mac או Windows — ומורידים.</p></div>
+      <div class="step"><div class="n">2</div><h3>התקנה</h3><p>פותחים את הקובץ ומתקינים. המערכת מזהה לבד את המחשב ומתאימה את עצמה.</p></div>
+      <div class="step"><div class="n">3</div><h3>הרשמה חינם</h3><p>בפתיחה הראשונה נרשמים בחינם ומקבלים מיד גישה מלאה לתקופת ניסיון.</p></div>
+    </div>
+  </section>
+
+  <section id="feat">
+    <div class="sec-t">מה יש בפנים</div>
+    <p class="sec-s">מערכת אחת, לכל סוג משתמש</p>
+    <div class="feats">
+      <div class="feat"><div class="ico">🎧</div><h4>אולפן דיג'יי</h4><p>שני דקים, מיקס, BPM וסולם, אפקטים</p></div>
+      <div class="feat"><div class="ico">🎤</div><h4>קריוקי על וידאו</h4><p>מילים מסונכרנות, הסרת ווקאל, דואט</p></div>
+      <div class="feat"><div class="ico">📖</div><h4>חדר ילדים</h4><p>קריאה ושירה לפי השיר, משחקי אותיות</p></div>
+      <div class="feat"><div class="ico">✂️</div><h4>חדר יוצרים</h4><p>עריכה, בניית ליווי והפקה — הכול מודרך</p></div>
+      <div class="feat"><div class="ico">🎹</div><h4>סטודיו AI</h4><p>מזמזמים — וה-AI בונה ליווי מלא</p></div>
+      <div class="feat"><div class="ico">📡</div><h4>שידור חי</h4><p>ל-YouTube ולטלוויזיה, בלי דיליי</p></div>
+      <div class="feat"><div class="ico">🎬</div><h4>קליפים</h4><p>מצלמה חיה מאחורי המילים — ומקליטים</p></div>
+      <div class="feat"><div class="ico">📱</div><h4>גם בנייד</h4><p>אותו ממשק, מותאם לטלפון</p></div>
+    </div>
+  </section>
+
+  <section class="cta" id="dl2">
+    <div class="sec-t" style="margin-top:0">מוכנים להתחיל?</div>
+    <p class="sec-s">הורדה חינם, הרשמה בפתיחה הראשונה.</p>
+    <div class="dlrow" id="dlrow2"></div>
+  </section>
+
+  <footer>DJ DVIR · כל הזכויות שמורות · <span id="yr"></span></footer>
+</div>
+
+<script>
+/* CONFIG — set once. The site is "connected": it tries to read the live download links + version from the
+   licensing hub (manage them in the admin's "קישורי הורדה" card); if the hub isn't reachable it falls back
+   to these. Point HUB at your cloud hub when it's hosted. */
+const CFG = {
+  HUB: '',   // e.g. 'https://dj-dvir-hub.onrender.com' — leave '' to use only the fallbacks below
+  fallback: {
+    mac: { url: 'https://github.com/Nadav-art/dj-dvir-download/releases/latest/download/DJ-Dvir-mac.dmg', version: '2.2.0' },
+    win: { url: 'https://github.com/Nadav-art/dj-dvir-download/releases/latest/download/DJ-Dvir-win.exe', version: '2.2.0' },
+  },
+};
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+function detectOS(){
+  const p = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || navigator.userAgent;
+  if (/Win/i.test(p)) return 'win';
+  if (/Mac|iPhone|iPad|iPod/i.test(p)) return 'mac';
+  return 'mac';
+}
+function btn(os, info, primary){
+  const label = os === 'win' ? 'Windows' : 'Mac';
+  const ico = os === 'win' ? '🪟' : '';
+  return `<a class="dl ${primary ? '' : 'alt'}" href="${info.url}" data-os="${os}">
+    <span class="os">${ico}</span><span>הורדה ל-${label}<small>גרסה ${info.version}</small></span></a>`;
+}
+function render(links){
+  const os = detectOS(), other = os === 'win' ? 'mac' : 'win';
+  const html = btn(os, links[os], true) + btn(other, links[other], false);
+  document.getElementById('dlrow').innerHTML = html;
+  document.getElementById('dlrow2').innerHTML = html;
+  document.getElementById('ver').textContent = '✓ זוהה: ' + (os === 'win' ? 'Windows' : 'Mac') + ' · גרסה ' + links[os].version;
+}
+async function load(){
+  let links = CFG.fallback;
+  if (CFG.HUB) {
+    try {
+      const r = await fetch(CFG.HUB.replace(/\/$/, '') + '/api/download', { cache: 'no-store' });
+      if (r.ok) { const d = await r.json(); if (d && d.mac && d.win) links = d; }
+    } catch (_) {}
+  }
+  render(links);
+}
+load();
+</script>
+</body>
+</html>

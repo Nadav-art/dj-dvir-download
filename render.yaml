@@ -1,0 +1,16 @@
+# Render.com — free static hosting for the DJ Dvir download site.
+# Render serves this repo as a static site and gives a FREE https://<name>.onrender.com domain automatically.
+# Deploy: render.com → New → Static Site → connect this GitHub repo → it reads this file. No build, no cost.
+services:
+  - type: web
+    name: dj-dvir-download
+    runtime: static
+    staticPublishPath: .
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=300
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
