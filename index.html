@@ -70,8 +70,18 @@ h1 .grad{background:linear-gradient(90deg,#18e0ff,#8a5bff);-webkit-background-cl
 .fmhead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
 .fmico{font-size:38px}.fmhead h3{margin:0;font-size:22px;font-weight:800}
 .fmscene .shot{width:100%;border-radius:12px;display:block;border:1px solid #20305c;box-shadow:0 10px 30px rgba(0,0,0,.4)}
-.aidemo{margin-top:14px;text-align:center;background:linear-gradient(180deg,rgba(40,30,80,.4),rgba(12,22,48,.5));border:1px solid var(--line);border-radius:14px;padding:16px}
-.aidemo-t{font-size:14px;font-weight:700;color:#e4ddff;margin-bottom:12px}
+.aidemo{text-align:center;background:radial-gradient(ellipse at 50% 20%,#1f2a55,#0a1430);border:1px solid var(--line);border-radius:16px;padding:22px 18px;min-height:200px;display:flex;flex-direction:column;justify-content:center}
+.aidemo-t{font-size:17px;font-weight:800;color:#eaf0ff;margin-bottom:16px}
+.aidemo-wave{display:flex;gap:4px;align-items:center;justify-content:center;height:46px;margin-bottom:16px}
+.aidemo-wave span{width:5px;height:14px;border-radius:3px;background:linear-gradient(#5b8cff,#8a5bff)}
+.aidemo.rec .aidemo-wave span{animation:awv .7s ease-in-out infinite}
+.aidemo.rec .aidemo-wave span:nth-child(2n){animation-delay:.15s}.aidemo.rec .aidemo-wave span:nth-child(3n){animation-delay:.3s}
+@keyframes awv{0%,100%{height:10px}50%{height:46px}}
+.aidemo-rec{display:inline-flex;align-items:center;gap:10px;margin:0 auto;border:0;border-radius:999px;padding:14px 28px;font:inherit;font-size:16px;font-weight:800;color:#fff;cursor:pointer;background:linear-gradient(90deg,#5b8cff,#8a5bff);box-shadow:0 12px 30px rgba(91,140,255,.4)}
+.aidemo-rec:hover{filter:brightness(1.08)}.aidemo-rec[disabled]{opacity:.7;cursor:default}
+.aidemo-rec .dot{width:12px;height:12px;border-radius:50%;background:#fff}
+.aidemo.rec .aidemo-rec{background:linear-gradient(90deg,#ff3b5c,#ff7a43)}.aidemo.rec .aidemo-rec .dot{animation:blink 1s infinite}
+.aidemo #aiStatus{margin-top:14px;font-size:13.5px}
 .fmemo{color:#d3ddf7;font-size:15.5px;line-height:1.75;margin:16px 2px 20px;text-align:center}
 .fmdl{text-align:center}
 .scene{position:relative;border-radius:16px;overflow:hidden;min-height:200px;background:radial-gradient(ellipse at 50% 28%,#1a2d5a,#070e1f);border:1px solid #20305c;display:flex;align-items:center;justify-content:center;gap:14px;padding:18px;flex-wrap:wrap}
@@ -160,7 +170,7 @@ footer{margin-top:48px;text-align:center;color:#5f719c;font-size:12.5px;padding-
    licensing hub (manage them in the admin's "קישורי הורדה" card); if the hub isn't reachable it falls back
    to these. Point HUB at your cloud hub when it's hosted. */
 const CFG = {
-  DEMO_API: '',   // the live AI-demo API (Render web service running the existing engine); set after deploy to enable the "try it" recorder
+  DEMO_API: 'https://dj-dvir-demo-api.onrender.com',   // the live AI-demo API (Render web service running the existing engine)
   HUB: '',   // e.g. 'https://dj-dvir-hub.onrender.com' — leave '' to use only the fallbacks below
   fallback: {
     mac: { url: 'https://github.com/Nadav-art/dj-dvir-download/releases/latest/download/DJ-Dvir-mac.dmg', version: '2.2.0' },
@@ -220,20 +230,27 @@ function openFeat(key) { const f = FEATURES[key]; if (!f) return;
   document.getElementById('fmico').textContent = f.ico;
   document.getElementById('fmtitle').textContent = f.title;
   // REAL screenshot from the actual app (not a mockup)
-  document.getElementById('fmscene').innerHTML = `<img class="shot" src="assets/shots/feat-${key}.jpg?v=1" alt="${f.title}">`
-    + (key === 'ai' && CFG.DEMO_API ? aiDemoHTML() : '');
-  document.getElementById('fmemo').textContent = f.emo;
+  // the AI feature shows a LIVE, working humming interface (record → the real engine builds a backing),
+  // not a static screenshot. Every other feature shows a real screenshot.
+  document.getElementById('fmscene').innerHTML = (key === 'ai')
+    ? aiDemoHTML()
+    : `<img class="shot" src="assets/shots/feat-${key}.jpg?v=1" alt="${f.title}">`;
+  document.getElementById('fmemo').textContent = (key === 'ai') ? 'זמזמו עד 5 שניות — וה-AI יהפוך את זה לליווי מלא (ממש כאן, לא הדמיה).' : f.emo;
   document.getElementById('fmodal').classList.add('on');
-  if (key === 'ai' && CFG.DEMO_API) wireAiDemo();
+  if (key === 'ai') wireAiDemo();
 }
 
-// ---- LIVE AI demo: hum ~5s → the REAL engine (via the demo API) builds a backing → plays it here ----
+// ---- LIVE AI demo: a real humming interface. Record up to 5s → the REAL engine (via the demo API) builds a
+// full backing → plays it right here. The person actually records; it is not a picture of the feature. ----
 function aiDemoHTML() {
   return `<div class="aidemo">
-    <div class="aidemo-t">🎤 נסו עכשיו — זמזמו 5 שניות, וה-AI יבנה לכם ליווי אמיתי</div>
-    <button class="dl" id="aiRec" style="padding:12px 22px">🎤 הקליטו וזמזמו</button>
-    <div class="note" id="aiStatus" style="min-height:20px;margin-top:10px"></div>
-    <audio id="aiAudio" controls style="display:none;width:100%;margin-top:8px"></audio>
+    <div class="aidemo-t">🎹 זמזמו מנגינה — וה-AI יבנה ליווי מלא</div>
+    <div class="aidemo-wrap">
+      <div class="aidemo-wave" id="aiWave"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <button class="aidemo-rec" id="aiRec"><span class="dot"></span> הקליטו (עד 5 שניות)</button>
+      <div class="note" id="aiStatus">הקישו, זמזמו מנגינה קצרה — והקשיבו מה שה-AI בונה.</div>
+      <audio id="aiAudio" controls style="display:none;width:100%;margin-top:10px"></audio>
+    </div>
   </div>`;
 }
 function encodeWAV(buf) {
@@ -248,8 +265,10 @@ function encodeWAV(buf) {
   return new Blob([v], { type: 'audio/wav' });
 }
 function wireAiDemo() {
-  const btn = document.getElementById('aiRec'), st = document.getElementById('aiStatus'), au = document.getElementById('aiAudio');
+  const box = document.querySelector('.aidemo'), btn = document.getElementById('aiRec'),
+        st = document.getElementById('aiStatus'), au = document.getElementById('aiAudio');
   if (!btn) return;
+  const lbl = t => { btn.innerHTML = '<span class="dot"></span> ' + t; };
   btn.onclick = async () => {
     btn.disabled = true; au.style.display = 'none'; st.textContent = 'מבקש גישה למיקרופון…';
     let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
@@ -257,8 +276,8 @@ function wireAiDemo() {
     const rec = new MediaRecorder(stream), chunks = [];
     rec.ondataavailable = e => e.data.size && chunks.push(e.data);
     rec.onstop = async () => {
-      stream.getTracks().forEach(t => t.stop());
-      st.textContent = '🎹 ה-AI בונה את הליווי… רגע';
+      stream.getTracks().forEach(t => t.stop()); box.classList.remove('rec');
+      st.textContent = '🎹 ה-AI בונה את הליווי… (יכול לקחת רגע בהתעוררות השרת)';
       try {
         const ab = await new Blob(chunks).arrayBuffer();
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -267,12 +286,13 @@ function wireAiDemo() {
         const r = await fetch(CFG.DEMO_API.replace(/\/$/, '') + '/api/demo', { method: 'POST', body: fd });
         if (!r.ok) throw new Error();
         au.src = URL.createObjectURL(await r.blob()); au.style.display = 'block'; au.play().catch(() => {});
-        st.innerHTML = '✨ <b>זה הליווי שה-AI בנה מהזמזום שלך!</b> — תארו לכם מה אפשר במערכת המלאה.';
-      } catch (e) { st.textContent = 'לא הצלחנו לבנות הפעם — נסו שוב (לפעמים השרת מתעורר, רגע).'; }
-      btn.disabled = false; btn.textContent = '🎤 עוד פעם';
+        st.innerHTML = '✨ <b>זה הליווי שה-AI בנה מהזמזום שלך!</b> — דמיינו מה אפשר במערכת המלאה.';
+      } catch (e) { st.textContent = 'השרת מתעורר (free) — נסו שוב בעוד רגע.'; }
+      btn.disabled = false; lbl('הקליטו שוב');
     };
-    rec.start(); let t = 5; st.textContent = '🔴 מקליט… זמזמו מנגינה (' + t + ')';
-    const iv = setInterval(() => { t--; if (t > 0) st.textContent = '🔴 מקליט… זמזמו (' + t + ')'; else { clearInterval(iv); try { rec.stop(); } catch (_) {} } }, 1000);
+    box.classList.add('rec'); rec.start();
+    let t = 5; st.textContent = '🔴 זמזמו מנגינה… ' + t;
+    const iv = setInterval(() => { t--; if (t > 0) st.textContent = '🔴 זמזמו מנגינה… ' + t; else { clearInterval(iv); try { rec.stop(); } catch (_) {} } }, 1000);
   };
 }
 function closeFeat() { document.getElementById('fmodal').classList.remove('on'); }
