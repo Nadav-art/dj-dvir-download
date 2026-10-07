@@ -70,6 +70,8 @@ h1 .grad{background:linear-gradient(90deg,#18e0ff,#8a5bff);-webkit-background-cl
 .fmhead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
 .fmico{font-size:38px}.fmhead h3{margin:0;font-size:22px;font-weight:800}
 .fmscene .shot{width:100%;border-radius:12px;display:block;border:1px solid #20305c;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.aidemo{margin-top:14px;text-align:center;background:linear-gradient(180deg,rgba(40,30,80,.4),rgba(12,22,48,.5));border:1px solid var(--line);border-radius:14px;padding:16px}
+.aidemo-t{font-size:14px;font-weight:700;color:#e4ddff;margin-bottom:12px}
 .fmemo{color:#d3ddf7;font-size:15.5px;line-height:1.75;margin:16px 2px 20px;text-align:center}
 .fmdl{text-align:center}
 .scene{position:relative;border-radius:16px;overflow:hidden;min-height:200px;background:radial-gradient(ellipse at 50% 28%,#1a2d5a,#070e1f);border:1px solid #20305c;display:flex;align-items:center;justify-content:center;gap:14px;padding:18px;flex-wrap:wrap}
@@ -158,6 +160,7 @@ footer{margin-top:48px;text-align:center;color:#5f719c;font-size:12.5px;padding-
    licensing hub (manage them in the admin's "קישורי הורדה" card); if the hub isn't reachable it falls back
    to these. Point HUB at your cloud hub when it's hosted. */
 const CFG = {
+  DEMO_API: '',   // the live AI-demo API (Render web service running the existing engine); set after deploy to enable the "try it" recorder
   HUB: '',   // e.g. 'https://dj-dvir-hub.onrender.com' — leave '' to use only the fallbacks below
   fallback: {
     mac: { url: 'https://github.com/Nadav-art/dj-dvir-download/releases/latest/download/DJ-Dvir-mac.dmg', version: '2.2.0' },
@@ -217,9 +220,60 @@ function openFeat(key) { const f = FEATURES[key]; if (!f) return;
   document.getElementById('fmico').textContent = f.ico;
   document.getElementById('fmtitle').textContent = f.title;
   // REAL screenshot from the actual app (not a mockup)
-  document.getElementById('fmscene').innerHTML = `<img class="shot" src="assets/shots/feat-${key}.jpg?v=1" alt="${f.title}">`;
+  document.getElementById('fmscene').innerHTML = `<img class="shot" src="assets/shots/feat-${key}.jpg?v=1" alt="${f.title}">`
+    + (key === 'ai' && CFG.DEMO_API ? aiDemoHTML() : '');
   document.getElementById('fmemo').textContent = f.emo;
   document.getElementById('fmodal').classList.add('on');
+  if (key === 'ai' && CFG.DEMO_API) wireAiDemo();
+}
+
+// ---- LIVE AI demo: hum ~5s → the REAL engine (via the demo API) builds a backing → plays it here ----
+function aiDemoHTML() {
+  return `<div class="aidemo">
+    <div class="aidemo-t">🎤 נסו עכשיו — זמזמו 5 שניות, וה-AI יבנה לכם ליווי אמיתי</div>
+    <button class="dl" id="aiRec" style="padding:12px 22px">🎤 הקליטו וזמזמו</button>
+    <div class="note" id="aiStatus" style="min-height:20px;margin-top:10px"></div>
+    <audio id="aiAudio" controls style="display:none;width:100%;margin-top:8px"></audio>
+  </div>`;
+}
+function encodeWAV(buf) {
+  const ch = buf.getChannelData(0), sr = buf.sampleRate, n = ch.length;
+  const b = new ArrayBuffer(44 + n * 2), v = new DataView(b);
+  const ws = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  ws(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); ws(8, 'WAVE'); ws(12, 'fmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  ws(36, 'data'); v.setUint32(40, n * 2, true);
+  let o = 44; for (let i = 0; i < n; i++) { const s = Math.max(-1, Math.min(1, ch[i])); v.setInt16(o, s < 0 ? s * 0x8000 : s * 0x7FFF, true); o += 2; }
+  return new Blob([v], { type: 'audio/wav' });
+}
+function wireAiDemo() {
+  const btn = document.getElementById('aiRec'), st = document.getElementById('aiStatus'), au = document.getElementById('aiAudio');
+  if (!btn) return;
+  btn.onclick = async () => {
+    btn.disabled = true; au.style.display = 'none'; st.textContent = 'מבקש גישה למיקרופון…';
+    let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+    catch (e) { st.textContent = '🎙️ צריך הרשאת מיקרופון כדי לנסות'; btn.disabled = false; return; }
+    const rec = new MediaRecorder(stream), chunks = [];
+    rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+    rec.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      st.textContent = '🎹 ה-AI בונה את הליווי… רגע';
+      try {
+        const ab = await new Blob(chunks).arrayBuffer();
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const wav = encodeWAV(await ctx.decodeAudioData(ab));
+        const fd = new FormData(); fd.append('file', wav, 'hum.wav'); fd.append('style', 'pop');
+        const r = await fetch(CFG.DEMO_API.replace(/\/$/, '') + '/api/demo', { method: 'POST', body: fd });
+        if (!r.ok) throw new Error();
+        au.src = URL.createObjectURL(await r.blob()); au.style.display = 'block'; au.play().catch(() => {});
+        st.innerHTML = '✨ <b>זה הליווי שה-AI בנה מהזמזום שלך!</b> — תארו לכם מה אפשר במערכת המלאה.';
+      } catch (e) { st.textContent = 'לא הצלחנו לבנות הפעם — נסו שוב (לפעמים השרת מתעורר, רגע).'; }
+      btn.disabled = false; btn.textContent = '🎤 עוד פעם';
+    };
+    rec.start(); let t = 5; st.textContent = '🔴 מקליט… זמזמו מנגינה (' + t + ')';
+    const iv = setInterval(() => { t--; if (t > 0) st.textContent = '🔴 מקליט… זמזמו (' + t + ')'; else { clearInterval(iv); try { rec.stop(); } catch (_) {} } }, 1000);
+  };
 }
 function closeFeat() { document.getElementById('fmodal').classList.remove('on'); }
 document.querySelectorAll('.feat[data-feat]').forEach(c => c.onclick = () => openFeat(c.dataset.feat));
