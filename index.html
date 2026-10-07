@@ -27,8 +27,15 @@ body{font-family:'Rubik',-apple-system,'Segoe UI',Arial,sans-serif;color:var(--i
 .wrap{max-width:1040px;margin:0 auto;padding:24px 20px 60px}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0 10px}
 .logo{width:min(44vw,210px);aspect-ratio:2400/820;background:url(assets/djdvir-logo.png) center/contain no-repeat}
-.nav a{color:var(--mut);text-decoration:none;font-size:14px;margin-inline-start:16px}
+.nav{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px 18px}
+.nav a{color:var(--mut);text-decoration:none;font-size:14px}
 .nav a:hover{color:var(--ink)}
+@media(max-width:600px){
+  header{flex-direction:column;gap:8px;padding:4px 0 10px}
+  .logo{width:min(62vw,200px)}
+  .nav{justify-content:center;gap:6px 20px;width:100%}
+  .nav a{font-size:14.5px;padding:4px 2px}
+}
 .hero{text-align:center;padding:40px 0 18px}
 .badge{display:inline-block;background:rgba(91,140,255,.16);border:1px solid rgba(91,140,255,.4);color:#bcd0ff;
   border-radius:999px;padding:5px 15px;font-size:13px;font-weight:600;margin-bottom:16px}
@@ -187,10 +194,14 @@ const CFG = {
 document.getElementById('yr').textContent = new Date().getFullYear();
 
 function detectOS(){
-  const p = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || navigator.userAgent;
+  const ua = navigator.userAgent || '';
+  const p = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || ua;
+  if (/Android/i.test(ua)) return 'android';
+  // iPhone/iPod report iOS; iPadOS reports as "Mac" but has a touchscreen — tell them apart
+  if (/iPhone|iPad|iPod/i.test(ua) || (/Mac/i.test(p) && (navigator.maxTouchPoints || 0) > 1)) return 'ios';
   if (/Win/i.test(p)) return 'win';
-  if (/Mac|iPhone|iPad|iPod/i.test(p)) return 'mac';
-  return 'mac';
+  if (/Mac/i.test(p)) return 'mac';
+  return 'win';
 }
 function btn(os, info, primary){
   const label = os === 'win' ? 'Windows' : 'Mac';
@@ -199,11 +210,22 @@ function btn(os, info, primary){
     <span class="os">${ico}</span><span>הורדה ל-${label}<small>גרסה ${info.version}</small></span></a>`;
 }
 function render(links){
-  const os = detectOS(), other = os === 'win' ? 'mac' : 'win';
+  const os = detectOS();
+  const ver = document.getElementById('ver');
+  if (os === 'ios' || os === 'android'){   // phones/tablets: the system is a desktop app — don't claim "Mac"
+    const dname = os === 'ios' ? 'אייפון/אייפד' : 'אנדרואיד';
+    const desk = btn('win', links.win, false) + btn('mac', links.mac, false);
+    document.getElementById('dlrow').innerHTML =
+      `<span class="trust" style="display:block;margin-bottom:10px">📱 זוהה ${dname} — DJ Dvir רצה על <b>מחשב</b> (Windows / Mac). פִּתחו את הקישור במחשב כדי להוריד.</span>${desk}`;
+    document.getElementById('dlrow2').innerHTML = desk;
+    if (ver) ver.textContent = '📱 זוהה: ' + dname + ' · גרסת-המחשב זמינה להורדה במחשב';
+    return;
+  }
+  const other = os === 'win' ? 'mac' : 'win';
   const html = btn(os, links[os], true) + btn(other, links[other], false);
   document.getElementById('dlrow').innerHTML = html;
   document.getElementById('dlrow2').innerHTML = html;
-  document.getElementById('ver').textContent = '✓ זוהה: ' + (os === 'win' ? 'Windows' : 'Mac') + ' · גרסה ' + links[os].version;
+  if (ver) ver.textContent = '✓ זוהה: ' + (os === 'win' ? 'Windows' : 'Mac') + ' · גרסה ' + links[os].version;
 }
 // ---- feature "peek" popups: let people FEEL each room before downloading ----
 const wave = n => Array.from({ length: n }, (_, i) => `<i style="animation-delay:${(i * 0.07).toFixed(2)}s"></i>`).join('');
