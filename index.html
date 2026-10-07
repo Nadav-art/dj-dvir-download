@@ -216,9 +216,9 @@ function render(links){
     const dname = os === 'ios' ? 'אייפון/אייפד' : 'אנדרואיד';
     const desk = btn('win', links.win, false) + btn('mac', links.mac, false);
     document.getElementById('dlrow').innerHTML =
-      `<span class="trust" style="display:block;margin-bottom:10px">📱 זוהה ${dname} — DJ Dvir רצה על <b>מחשב</b> (Windows / Mac). פִּתחו את הקישור במחשב כדי להוריד.</span>${desk}`;
+      `<span class="trust" style="display:block;margin-bottom:10px">📱 DJ Dvir היא אפליקציית <b>מחשב</b> (Windows / Mac) — פִּתחו את הקישור במחשב כדי להוריד.</span>${desk}`;
     document.getElementById('dlrow2').innerHTML = desk;
-    if (ver) ver.textContent = '📱 זוהה: ' + dname + ' · גרסת-המחשב זמינה להורדה במחשב';
+    if (ver) ver.textContent = '';   // no repeated "זוהה אייפון" line — the message above says it once
     return;
   }
   const other = os === 'win' ? 'mac' : 'win';
