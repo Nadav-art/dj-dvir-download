@@ -368,18 +368,35 @@ function wireAiDemo() {
     clearInterval(iv); clearInterval(warmPoll); stopMeter();
     stream.getTracks().forEach(t => t.stop()); box.classList.remove('rec'); recording = false;
     btn.disabled = true; lbl('בונה ליווי…');
-    st.textContent = '🎹 ה-AI בונה את הליווי… רגע אחד';
+    let wav;
     try {
       const ab = await new Blob(chunks).arrayBuffer();
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const wav = encodeWAV(await ctx.decodeAudioData(ab));
-      const fd = new FormData(); fd.append('file', wav, 'hum.wav'); fd.append('style', style);
-      const r = await fetch(CFG.DEMO_API.replace(/\/$/, '') + '/api/demo', { method: 'POST', body: fd });
-      if (!r.ok) throw new Error();
-      au.src = URL.createObjectURL(await r.blob()); au.style.display = 'block'; au.play().catch(() => {});
-      st.innerHTML = '✨ <b>זה הליווי שה-AI בנה מהזמזום שלך!</b> - דמיינו מה אפשר במערכת המלאה.';
-    } catch (e) { st.textContent = '⏳ רגע - המנוע מתכונן. נסו שוב עוד כמה שניות.'; }
-    btn.disabled = false; lbl('הקליטו שוב');
+      wav = encodeWAV(await ctx.decodeAudioData(ab));
+    } catch (_) { st.textContent = 'לא הצלחתי לקרוא את ההקלטה - נסו שוב'; btn.disabled = false; lbl('הקליטו שוב'); return; }
+    // The demo engine runs on a free host that sleeps when idle; the FIRST request wakes it (~30-60s).
+    // So we retry a BOUNDED number of times with warm-up nudges, then fall back to an honest message +
+    // a download call-to-action — never an endless "try again" that erodes trust.
+    const url = CFG.DEMO_API.replace(/\/$/, '') + '/api/demo', MAX = 4;
+    for (let attempt = 1; attempt <= MAX; attempt++) {
+      st.textContent = attempt === 1 ? '🎹 ה-AI בונה את הליווי… רגע אחד'
+        : '⏳ מכינים את המנוע (בשימוש ראשון זה עד כדקה)… ' + attempt + '/' + MAX;
+      try {
+        const fd = new FormData(); fd.append('file', wav, 'hum.wav'); fd.append('style', style);
+        const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 30000);
+        const r = await fetch(url, { method: 'POST', body: fd, signal: ctl.signal });
+        clearTimeout(to);
+        if (!r.ok) throw new Error('status ' + r.status);
+        au.src = URL.createObjectURL(await r.blob()); au.style.display = 'block'; au.play().catch(() => {});
+        st.innerHTML = '✨ <b>זה הליווי שה-AI בנה מהזמזום שלך!</b> - דמיינו מה אפשר במערכת המלאה.';
+        btn.disabled = false; lbl('הקליטו שוב'); return;
+      } catch (e) {
+        if (attempt < MAX) { warmDemo(); await new Promise(res => setTimeout(res, 7000)); }
+      }
+    }
+    st.innerHTML = 'ההדגמה החיה לא זמינה כרגע 🙏 - אבל במערכת המלאה זה עובד מצוין. ' +
+      '<a href="#dl2" style="color:var(--acc);font-weight:800" onclick="document.getElementById(\'fmodal\').classList.remove(\'on\')">הורידו ותיהנו ←</a>';
+    btn.disabled = false; lbl('נסו שוב');
   }
 
   btn.onclick = async () => {
